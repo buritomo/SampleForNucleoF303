@@ -48,7 +48,9 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-
+MYADC ad1;
+float voltage;
+const float voltageConv = 4.096 / 2047.0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -60,17 +62,19 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 uint16_t analog_value;
-uint16_t next_value;
-MYADC AD_1;
+//uint16_t next_value;
+//MYADC AD_1;
 
-int __io_putchar(int c) { // To use printf(...);
+/*int __io_putchar(int c) { // To use printf(...);
   if( c == '\n' ) {
     int _c = '\r';
     HAL_UART_Transmit(&huart2, &_c, 1, 1);
   }
   HAL_UART_Transmit(&huart2, &c, 1, 1);
   return 0;
-}
+}*/
+
+//HAL_StatusTypeDef fuck = HAL_OK;
 /* USER CODE END 0 */
 
 /**
@@ -101,47 +105,43 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_I2C1_Init();
   MX_ADC1_Init();
   MX_USART2_UART_Init();
-  MX_ADC2_Init();
-  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
-  setbuf(stdout, NULL); // To use printf(...);
+  //setbuf(stdout, NULL); // To use printf(...);
 
   HAL_ADC_Start(&hadc1);
-  HAL_ADC_Start(&hadc2);
+  //HAL_ADC_Start(&hadc2);
   HAL_ADCEx_Calibration_Start(&hadc1, ADC_SINGLE_ENDED);
-  HAL_ADCEx_Calibration_Start(&hadc2, ADC_SINGLE_ENDED);
+  //HAL_ADCEx_Calibration_Start(&hadc2, ADC_SINGLE_ENDED);
 
-  AD_1 = ADCInit(AD_1, ADC_ZER, 0, ADC_CONVERSIONDELAY, 4, ADC_REG_CONFIG_PGA_2_048V);
-  ADCSetReadSingle(AD_1);
+  ad1 = AdcInit(0x49, ADC_CONVERSIONDELAY, ADC_REG_BITSHIFT, ADC_REG_CONFIG_PGA_4_096V);
+  AdcSetContinuous(ad1, 0);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  //HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
-	  /*
+	  HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
+
 	  HAL_ADC_PollForConversion(&hadc1, 100);
 	  analog_value = HAL_ADC_GetValue(&hadc1);
-	  HAL_ADC_PollForConversion(&hadc2, 100);
-	  next_value = HAL_ADC_GetValue(&hadc2);
-	  if(analog_value < 2048){
+	  //HAL_ADC_PollForConversion(&hadc2, 100);
+	  //next_value = HAL_ADC_GetValue(&hadc2);
+	  /*if(analog_value < 2048){
 		  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, RESET);
 	  }else{
 		  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, SET);
-	  }
-	  printf("%d,",analog_value);
-	  printf("%d\n", next_value);
+	  }*/
+	  //printf("%d,",analog_value);
+	  //printf("%d\n", next_value);
 	  //HAL_Delay(500);
-	   * */
-	  HAL_I2C_IsDeviceReady(&hi2c1, AD_1.m_i2caddress, 3, 100);
-	  HAL_Delay(100);
-	  analog_value = ADCReadSingle(AD_1);
-	  HAL_Delay(100);
 
+	  //AdcSetSingleShot(ad1, 0);
+	  voltage = AdcReadSingle(ad1) * voltageConv;
 
     /* USER CODE END WHILE */
 
