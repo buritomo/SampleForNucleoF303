@@ -13,7 +13,6 @@
 
 typedef struct{
 	uint8_t m_i2caddress;
-	uint8_t m_ch;
 	uint8_t m_conversionDelay;
 	uint8_t m_bitShift;
 	uint16_t m_gain;
@@ -25,7 +24,7 @@ typedef struct{
 #define ADC_THR 0x4b // ADC should be SCL
 
 //conversion delay
-#define ADC_CONVERSIONDELAY 1
+#define ADC_CONVERSIONDELAY 20
 
 //pointer register
 #define ADC_REG_P_MASK 0x03 //point mask
@@ -89,12 +88,10 @@ typedef struct{
 #define ADC_REG_CONFIG_CQUE_4CONV (0x0002) ///< Assert ALERT/RDY after four conversions
 #define ADC_REG_CONFIG_CQUE_NONE (0x0003) ///< Disable the comparator and put ALERT/RDY in high state (default)
 
+#define ADC_REG_BITSHIFT 4
 
-uint16_t ADCReadReg(MYADC);
-void ADCWriteConfigReg(MYADC, uint16_t);
-MYADC ADCInit(MYADC, uint8_t, uint8_t, uint8_t, uint8_t, uint16_t);
-uint16_t ADCSetConfig(uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t);
-void ADCSetReadSingle(MYADC);
-uint16_t ADCReadSingle(MYADC);
-
+MYADC AdcInit(uint8_t, uint8_t, uint8_t, uint16_t);
+void AdcSetContinuous(MYADC, uint8_t);
+void AdcSetSingleShot(MYADC, uint8_t);
+uint16_t AdcReadSingle(MYADC adcSet);
 #endif /* INC_MYADC_H_ */
