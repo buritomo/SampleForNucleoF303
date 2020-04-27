@@ -20,9 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "adc.h"
 #include "i2c.h"
-#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -61,20 +59,7 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint16_t analog_value;
-//uint16_t next_value;
-//MYADC AD_1;
 
-/*int __io_putchar(int c) { // To use printf(...);
-  if( c == '\n' ) {
-    int _c = '\r';
-    HAL_UART_Transmit(&huart2, &_c, 1, 1);
-  }
-  HAL_UART_Transmit(&huart2, &c, 1, 1);
-  return 0;
-}*/
-
-//HAL_StatusTypeDef fuck = HAL_OK;
 /* USER CODE END 0 */
 
 /**
@@ -106,17 +91,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_I2C1_Init();
-  MX_ADC1_Init();
-  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-
-  //setbuf(stdout, NULL); // To use printf(...);
-
-  HAL_ADC_Start(&hadc1);
-  //HAL_ADC_Start(&hadc2);
-  HAL_ADCEx_Calibration_Start(&hadc1, ADC_SINGLE_ENDED);
-  //HAL_ADCEx_Calibration_Start(&hadc2, ADC_SINGLE_ENDED);
-
   ad1 = AdcInit(0x49, ADC_CONVERSIONDELAY, ADC_REG_BITSHIFT, ADC_REG_CONFIG_PGA_4_096V);
   AdcSetContinuous(ad1, 0);
   /* USER CODE END 2 */
@@ -125,21 +100,6 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
-
-	  HAL_ADC_PollForConversion(&hadc1, 100);
-	  analog_value = HAL_ADC_GetValue(&hadc1);
-	  //HAL_ADC_PollForConversion(&hadc2, 100);
-	  //next_value = HAL_ADC_GetValue(&hadc2);
-	  /*if(analog_value < 2048){
-		  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, RESET);
-	  }else{
-		  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, SET);
-	  }*/
-	  //printf("%d,",analog_value);
-	  //printf("%d\n", next_value);
-	  //HAL_Delay(500);
-
 	  //AdcSetSingleShot(ad1, 0);
 	  voltage = AdcReadSingle(ad1) * voltageConv;
 
@@ -165,9 +125,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL4;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -185,8 +143,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_I2C1|RCC_PERIPHCLK_ADC12;
-  PeriphClkInit.Adc12ClockSelection = RCC_ADC12PLLCLK_DIV1;
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_I2C1;
   PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_HSI;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
